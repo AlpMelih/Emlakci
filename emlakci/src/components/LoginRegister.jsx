@@ -1,96 +1,47 @@
-import React from 'react';
-import { Tabs, Form, Input, Button, Checkbox, Layout, Card } from 'antd';
+import React, { useState } from 'react';
+import { Tabs, Form, Input, Button, Checkbox, Layout, Card, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebase'; // Firebase Auth örneği
 
-const { Header, Content, Footer } = Layout;
-
-const LoginForm = () => {
-    const onFinish = (values) => {
-        console.log('Login values: ', values);
-    };
-
-    return (
-        <Form
-            name="login_form"
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-        >
-            <Form.Item
-                name="username"
-                rules={[{ required: true, message: 'Please input your Username!' }]}
-            >
-                <Input prefix={<UserOutlined />} placeholder="Username" />
-            </Form.Item>
-            <Form.Item
-                name="password"
-                rules={[{ required: true, message: 'Please input your Password!' }]}
-            >
-                <Input
-                    prefix={<LockOutlined />}
-                    type="password"
-                    placeholder="Password"
-                />
-            </Form.Item>
-            <Form.Item>
-                <Form.Item name="remember" valuePropName="checked" noStyle>
-                    <Checkbox>Remember me</Checkbox>
-                </Form.Item>
-                <a className="login-form-forgot" href="">
-                    Forgot password
-                </a>
-            </Form.Item>
-            <Form.Item>
-                <Button type="primary" htmlType="submit" className="login-form-button">
-                    Log in
-                </Button>
-            </Form.Item>
-        </Form>
-    );
-};
-
-const RegisterForm = () => {
-    const onFinish = (values) => {
-        console.log('Register values: ', values);
-    };
-
-    return (
-        <Form
-            name="register_form"
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-        >
-            <Form.Item
-                name="email"
-                rules={[{ required: true, message: 'Please input your Email!' }]}
-            >
-                <Input prefix={<MailOutlined />} placeholder="Email" />
-            </Form.Item>
-            <Form.Item
-                name="username"
-                rules={[{ required: true, message: 'Please input your Username!' }]}
-            >
-                <Input prefix={<UserOutlined />} placeholder="Username" />
-            </Form.Item>
-            <Form.Item
-                name="password"
-                rules={[{ required: true, message: 'Please input your Password!' }]}
-            >
-                <Input
-                    prefix={<LockOutlined />}
-                    type="password"
-                    placeholder="Password"
-                />
-            </Form.Item>
-            <Form.Item>
-                <Button type="primary" htmlType="submit" className="register-form-button">
-                    Register
-                </Button>
-            </Form.Item>
-        </Form>
-    );
-};
+const { Header, Content } = Layout;
 
 const LoginRegister = () => {
+    const [loginEmail, setLoginEmail] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
+
+    const [registerEmail, setRegisterEmail] = useState('');
+    const [registerPassword, setRegisterPassword] = useState('');
+    const [registerUsername, setRegisterUsername] = useState('');
+
+    const [loginLoading, setLoginLoading] = useState(false);
+    const [registerLoading, setRegisterLoading] = useState(false);
+
+    const handleLoginSubmit = async () => {
+        try {
+            setLoginLoading(true);
+            await signInWithEmailAndPassword(loginEmail, loginPassword);
+            message.success('Login successful!');
+            setLoginLoading(false);
+        } catch (error) {
+            console.error('Login error:', error);
+            message.error('Login failed. Please try again.');
+            setLoginLoading(false);
+        }
+    };
+
+    const handleRegisterSubmit = async () => {
+        try {
+            setRegisterLoading(true);
+            await createUserWithEmailAndPassword(registerEmail, registerPassword);
+            message.success('Registration successful!');
+            setRegisterLoading(false);
+        } catch (error) {
+            console.error('Registration error:', error);
+            message.error(error.message);
+            setRegisterLoading(false);
+        }
+    };
+
     return (
         <Layout style={{ minHeight: '100vh', minWidth: "100vw" }}>
             <Header
@@ -106,10 +57,93 @@ const LoginRegister = () => {
                 <Card style={{ maxWidth: '400px', margin: 'auto' }}>
                     <Tabs defaultActiveKey="1">
                         <Tabs.TabPane tab="Login" key="1">
-                            <LoginForm />
+                            <Form
+                                name="login_form"
+                                onFinish={handleLoginSubmit}
+                            >
+                                <Form.Item
+                                    name="email"
+                                    rules={[{ required: true, message: 'Please input your Email!' }]}
+                                >
+                                    <Input
+                                        prefix={<MailOutlined />}
+                                        placeholder="Email"
+                                        value={loginEmail}
+                                        onChange={(e) => setLoginEmail(e.target.value)}
+                                    />
+                                </Form.Item>
+                                <Form.Item
+                                    name="password"
+                                    rules={[{ required: true, message: 'Please input your Password!' }]}
+                                >
+                                    <Input
+                                        prefix={<LockOutlined />}
+                                        type="password"
+                                        placeholder="Password"
+                                        value={loginPassword}
+                                        onChange={(e) => setLoginPassword(e.target.value)}
+                                    />
+                                </Form.Item>
+                                <Form.Item>
+                                    <Form.Item name="remember" valuePropName="checked" noStyle>
+                                        <Checkbox>Remember me</Checkbox>
+                                    </Form.Item>
+                                    <a className="login-form-forgot" href="">
+                                        Forgot password
+                                    </a>
+                                </Form.Item>
+                                <Form.Item>
+                                    <Button type="primary" htmlType="submit" className="login-form-button" loading={loginLoading}>
+                                        Log in
+                                    </Button>
+                                </Form.Item>
+                            </Form>
                         </Tabs.TabPane>
                         <Tabs.TabPane tab="Register" key="2">
-                            <RegisterForm />
+                            <Form
+                                name="register_form"
+                                onFinish={handleRegisterSubmit}
+                            >
+                                <Form.Item
+                                    name="email"
+                                    rules={[{ required: true, message: 'Please input your Email!' }]}
+                                >
+                                    <Input
+                                        prefix={<MailOutlined />}
+                                        placeholder="Email"
+                                        value={registerEmail}
+                                        onChange={(e) => setRegisterEmail(e.target.value)}
+                                    />
+                                </Form.Item>
+                                <Form.Item
+                                    name="username"
+                                    rules={[{ required: true, message: 'Please input your Username!' }]}
+                                >
+                                    <Input
+                                        prefix={<UserOutlined />}
+                                        placeholder="Username"
+                                        value={registerUsername}
+                                        onChange={(e) => setRegisterUsername(e.target.value)}
+                                    />
+                                </Form.Item>
+                                <Form.Item
+                                    name="password"
+                                    rules={[{ required: true, message: 'Please input your Password!' }]}
+                                >
+                                    <Input
+                                        prefix={<LockOutlined />}
+                                        type="password"
+                                        placeholder="Password"
+                                        value={registerPassword}
+                                        onChange={(e) => setRegisterPassword(e.target.value)}
+                                    />
+                                </Form.Item>
+                                <Form.Item>
+                                    <Button type="primary" htmlType="submit" className="register-form-button" loading={registerLoading}>
+                                        Register
+                                    </Button>
+                                </Form.Item>
+                            </Form>
                         </Tabs.TabPane>
                     </Tabs>
                 </Card>

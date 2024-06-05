@@ -1,5 +1,9 @@
-import React from 'react';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import React, { useEffect } from 'react';
+import { Layout, Menu, Breadcrumb, theme } from 'antd';
+import { useNavigate } from 'react-router-dom'; // Importing useHistory from react-router-dom
+import { auth } from '../firebase'; // Importing Firebase Auth
+import LoginRegister from './LoginRegister'; // Importing LoginRegister page
+
 const { Header, Content, Footer } = Layout;
 
 const items = new Array(5).fill(null).map((_, index) => ({
@@ -11,6 +15,23 @@ const MainPage = () => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    const history = useNavigate()// Using useHistory hook to access the history object
+
+    useEffect(() => {
+        // Watching for user authentication state changes
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (!user) {
+                // Redirecting to LoginRegister page if user is not authenticated
+                history('/loginregister');
+            }
+        });
+
+        // Cleanup function for useEffect to unsubscribe when component unmounts
+        return () => {
+            unsubscribe();
+        };
+    }, [history]); // Dependency array to ensure useEffect runs only when history changes
 
     return (
         <Layout style={{ minHeight: '100vh', minWidth: '100vw' }}>
