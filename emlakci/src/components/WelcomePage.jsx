@@ -1,6 +1,6 @@
 import React from 'react';
-import { signOut } from 'firebase/auth'; // Importing signOut function from Firebase Auth
-import { auth } from '../firebase'; // Importing the Firebase Auth instance
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 import { Card, Flex } from 'antd';
 import emlaksat from "../assets/emlaksat.jpeg"
 import emlakbul from "../assets/emlakbul.jpeg"
