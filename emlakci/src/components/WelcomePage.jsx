@@ -12,13 +12,7 @@ const { Meta } = Card;
 
 function WelcomePage(props) {
     const history = useNavigate()
-    const handleSignOut = async () => {
-        try {
-            await signOut(auth);
-        } catch (error) {
-            console.error('Error signing out:', error);
-        }
-    };
+
 
     return (
         <div >
@@ -44,6 +38,7 @@ function WelcomePage(props) {
                 </div>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <Card
+                        onClick={() => { history("/home/estatelist") }}
                         hoverable
                         style={{ width: 240, textAlign: "center" }}
                         cover={<img alt="example" src={emlakbul} />}

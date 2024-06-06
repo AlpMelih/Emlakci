@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Menu, Breadcrumb, theme } from 'antd';
-import { Route, Routes, useNavigate } from 'react-router-dom'; // Importing useHistory from react-router-dom
-import { auth, db } from '../firebase'; // Importing Firebase Auth
-import LoginRegister from './LoginRegister'; // Importing LoginRegister page
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { auth, db } from '../firebase';
+import LoginRegister from './LoginRegister';
 import { collection, doc, getDoc } from 'firebase/firestore';
 import WelcomePage from './WelcomePage';
 import CreateEstate from './CreateEstate';
+import Estates from './Estates';
+import { Button } from 'antd/es/radio';
+import { signOut } from 'firebase/auth';
+
 
 const { Header, Content, Footer } = Layout;
 
@@ -21,7 +25,15 @@ const MainPage = () => {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
-    const history = useNavigate()// Using useHistory hook to access the history object
+    const history = useNavigate()
+
+    const handleSignOut = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
+    };
 
     useEffect(() => {
 
@@ -72,7 +84,11 @@ const MainPage = () => {
                         flex: 1,
                         minWidth: 0,
                     }}
+
                 />
+                {user && (
+                    <Button type="primary" onClick={handleSignOut}>Sign Out</Button>
+                )}
             </Header>
             <Content
                 style={{
@@ -98,6 +114,7 @@ const MainPage = () => {
                     {user && <Routes>
                         <Route path='/welcome' element={<WelcomePage data={data}></WelcomePage>}></Route>
                         <Route path='/emlakekle' element={<CreateEstate></CreateEstate>}></Route>
+                        <Route path='/estatelist' element={<Estates></Estates>}></Route>
                     </Routes>
                     }
 
@@ -109,7 +126,7 @@ const MainPage = () => {
                     flexShrink: 0,
                 }}
             >
-                Ant Design ©{new Date().getFullYear()} Created by Ant UED
+
             </Footer>
         </Layout>
     );

@@ -78,7 +78,7 @@ function CreateEstate() {
                     >
                         <Option value="Konut">Konut</Option>
                         <Option value="İş yeri">İş yeri</Option>
-                        <Option value="Arsa">Arsa</Option>
+
                     </Select>
                 </Form.Item>
 
