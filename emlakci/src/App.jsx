@@ -5,6 +5,8 @@ import viteLogo from '/vite.svg'
 import MainPage from './components/MainPage'
 import LoginRegister from './components/LoginRegister'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import CreateEstate from './components/CreateEstate'
+import WelcomePage from './components/WelcomePage'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -14,7 +16,13 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/loginregister' element={<LoginRegister></LoginRegister>}></Route>
-          <Route path='/' element={<MainPage></MainPage>}></Route>
+          <Route path='/home' element={<MainPage></MainPage>}>
+            <Route path='welcome' element={<WelcomePage></WelcomePage>}></Route>
+            <Route path="emlakekle" element={<CreateEstate></CreateEstate>}>
+
+            </Route>
+          </Route>
+
         </Routes>
       </BrowserRouter>
 

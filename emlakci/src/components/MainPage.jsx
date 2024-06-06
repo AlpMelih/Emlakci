@@ -1,17 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout, Menu, Breadcrumb, theme } from 'antd';
-import { useNavigate } from 'react-router-dom'; // Importing useHistory from react-router-dom
-import { auth } from '../firebase'; // Importing Firebase Auth
+import { Route, Routes, useNavigate } from 'react-router-dom'; // Importing useHistory from react-router-dom
+import { auth, db } from '../firebase'; // Importing Firebase Auth
 import LoginRegister from './LoginRegister'; // Importing LoginRegister page
+import { collection, doc, getDoc } from 'firebase/firestore';
+import WelcomePage from './WelcomePage';
+import CreateEstate from './CreateEstate';
 
 const { Header, Content, Footer } = Layout;
 
-const items = new Array(5).fill(null).map((_, index) => ({
+const items = new Array(0).fill(null).map((_, index) => ({
     key: String(index + 1),
     label: `nav ${index + 1}`,
 }));
 
 const MainPage = () => {
+    const [user, setUser] = useState(false)
+    const [data, setData] = useState()
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
@@ -19,19 +24,31 @@ const MainPage = () => {
     const history = useNavigate()// Using useHistory hook to access the history object
 
     useEffect(() => {
-        // Watching for user authentication state changes
-        const unsubscribe = auth.onAuthStateChanged((user) => {
+
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (!user) {
-                // Redirecting to LoginRegister page if user is not authenticated
+
                 history('/loginregister');
+            }
+            else {
+
+                const userUID = user.uid
+                console.log(userUID)
+                const DocRef = doc(db, "users", userUID)
+                const getData = await getDoc(DocRef)
+                const data = getData.data()
+                setData(data)
+                setUser(true)
+
             }
         });
 
-        // Cleanup function for useEffect to unsubscribe when component unmounts
+
+
         return () => {
             unsubscribe();
         };
-    }, [history]); // Dependency array to ensure useEffect runs only when history changes
+    }, [history]);
 
     return (
         <Layout style={{ minHeight: '100vh', minWidth: '100vw' }}>
@@ -68,9 +85,7 @@ const MainPage = () => {
                         margin: '16px 0',
                     }}
                 >
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>List</Breadcrumb.Item>
-                    <Breadcrumb.Item>MainPage</Breadcrumb.Item>
+
                 </Breadcrumb>
                 <div
                     style={{
@@ -80,7 +95,12 @@ const MainPage = () => {
                         borderRadius: borderRadiusLG,
                     }}
                 >
-                    Content
+                    {user && <Routes>
+                        <Route path='/welcome' element={<WelcomePage data={data}></WelcomePage>}></Route>
+                        <Route path='/emlakekle' element={<CreateEstate></CreateEstate>}></Route>
+                    </Routes>
+                    }
+
                 </div>
             </Content>
             <Footer

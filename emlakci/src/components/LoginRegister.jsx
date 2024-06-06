@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Tabs, Form, Input, Button, Checkbox, Layout, Card, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebase'; // Firebase Auth örneği
+import { auth, db } from '../firebase'; // Firebase Auth ve Firestore örneği
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { doc, setDoc } from 'firebase/firestore';
 
 const { Header, Content } = Layout;
 
 const LoginRegister = () => {
+    const navigate = useNavigate();
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
 
@@ -19,9 +23,10 @@ const LoginRegister = () => {
     const handleLoginSubmit = async () => {
         try {
             setLoginLoading(true);
-            await signInWithEmailAndPassword(loginEmail, loginPassword);
+            await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
             message.success('Login successful!');
             setLoginLoading(false);
+            navigate("/home/welcome");
         } catch (error) {
             console.error('Login error:', error);
             message.error('Login failed. Please try again.');
@@ -32,7 +37,15 @@ const LoginRegister = () => {
     const handleRegisterSubmit = async () => {
         try {
             setRegisterLoading(true);
-            await createUserWithEmailAndPassword(registerEmail, registerPassword);
+            const userCredential = await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
+            const user = userCredential.user;
+
+            // Firestore'da kullanıcı dokümanı oluşturma
+            await setDoc(doc(db, 'users', user.uid), {
+                username: registerUsername,
+                email: registerEmail
+            });
+
             message.success('Registration successful!');
             setRegisterLoading(false);
         } catch (error) {
