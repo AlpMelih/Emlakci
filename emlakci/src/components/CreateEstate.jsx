@@ -41,7 +41,9 @@ function CreateEstate() {
     };
 
     const handleSubmit = async () => {
-        if ((!estateType) || (estateType == "Konut" && (!leks || !room || !details)) || (estateType == "İş yeri" && (!details || !m2 || !state))) {
+        if ((!estateType)
+            || (estateType == "Konut" && (!leks || !room || !details))
+            || (estateType == "İş yeri" && (!details || !m2 || !state))) {
 
             alert("Lütfen tüm alanları doldurun.");
             return;
