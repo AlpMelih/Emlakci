@@ -14,7 +14,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Default route redirects to /home/welcome */}
-          <Route path="/" element={<Navigate to="/home/welcome" />} />
+          <Route path="/" element={<Navigate to="home/welcome" />} />
 
           <Route path='/loginregister' element={<LoginRegister />} />
 
