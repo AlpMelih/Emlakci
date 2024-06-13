@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Input, Button, Card, List } from 'antd';
+import { Form, Select, Input, Button, Card, List, } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { db } from '../firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
 
 const { Option } = Select;
 
-function Estates() {
+function Estates(props) {
     const [filters, setFilters] = useState({
         estateType: null,
         leks: null,
@@ -13,6 +14,10 @@ function Estates() {
         details: null,
         m2: null,
         state: null,
+        landType: null,
+        treeAmount: null,
+        priceRange: null,
+        seller: null,
     });
     const [estates, setEstates] = useState([]);
 
@@ -52,6 +57,15 @@ function Estates() {
         if (filters.state) {
             q = query(q, where('state', '==', filters.state));
         }
+        if (filters.landType) {
+            q = query(q, where('landType', '==', filters.landType));
+        }
+        if (filters.treeAmount) {
+            q = query(q, where('treeAmount', '==', filters.treeAmount));
+        }
+        if (filters.priceRange) {
+            q = query(q, where('priceRange', '==', filters.priceRange));
+        }
 
         const querySnapshot = await getDocs(q);
         const estatesData = [];
@@ -59,6 +73,17 @@ function Estates() {
             estatesData.push({ id: doc.id, ...doc.data() });
         });
         setEstates(estatesData);
+    };
+
+    const handleDelete = async (id) => {
+        try {
+
+            await deleteDoc(doc(db, 'estates', id));
+
+            setEstates(estates.filter(estate => estate.id !== id));
+        } catch (error) {
+            console.error("Error deleting estate: ", error);
+        }
     };
 
     return (
@@ -69,14 +94,33 @@ function Estates() {
                         <Select
                             showSearch
                             placeholder="Emlak Tipi Seç"
-                            onChange={(value) => { setFilters({ estateType: value, leaks: null, room: null, details: null, m2: null, state: null }) }}
+                            onChange={(value) => { setFilters({ estateType: value, leks: null, room: null, details: null, m2: null, state: null }) }}
                         >
                             <Option value="Konut">Konut</Option>
                             <Option value="İş yeri">İş yeri</Option>
                             <Option value="Arsa">Arsa</Option>
                         </Select>
                     </Form.Item>
-                    {filters.estateType == "Konut" &&
+                    <Form.Item label="Fiyat Aralığı" required>
+                        <Select
+                            showSearch
+                            placeholder="Fiyat Aralığı"
+                            onChange={(value) => setFilters({ ...filters, priceRange: value })}>
+                            <Option value="0-1000">0-1000</Option>
+                            <Option value="1000-5000">1000-5000</Option>
+                            <Option value="5000-15000">5000-15000</Option>
+                            <Option value="15000-40000">15000-40000</Option>
+                            <Option value="40000-850000">40000-85000</Option>
+                            <Option value="85000-150000">85000-150000</Option>
+                            <Option value="150000-500000">150000-500000</Option>
+                            <Option value="500000-1000000">500000-1000000</Option>
+                            <Option value="1000000-5000000">1000000-5000000</Option>
+                            <Option value="5000000-10000000">5000000-10000000</Option>
+                            <Option value="10000000-100000000">10000000-100000000</Option>
+                            <Option value="100000000++">100000000++</Option>
+                        </Select>
+                    </Form.Item>
+                    {filters.estateType === "Konut" &&
                         <div>
                             <Form.Item label="Kat Sayısı">
                                 <Select
@@ -103,8 +147,7 @@ function Estates() {
                             </Form.Item>
                         </div>}
 
-
-                    {filters.estateType == "İş yeri" &&
+                    {filters.estateType === "İş yeri" &&
                         <div>
                             <Form.Item label="Metrekare">
                                 <Select
@@ -143,11 +186,22 @@ function Estates() {
                 renderItem={item => (
                     <List.Item>
                         <Card title={item.estateType}>
+
+                            {props.data.username === item.seller && (
+                                <DeleteOutlined
+                                    onClick={() => handleDelete(item.id)}
+                                    style={{ position: 'absolute', top: 10, right: 10, cursor: 'pointer' }}
+                                />
+                            )}
                             {item.leks && <p>Kat Sayısı: {item.leks}</p>}
                             {item.room && <p>Oda Sayısı: {item.room}</p>}
                             {item.m2 && <p>Metrekare: {item.m2}</p>}
                             {item.state && <p>Durumu: {item.state}</p>}
+                            {item.landType && <p>Arsa Türü: {item.landType}</p>}
+                            {item.treeAmount && <p>Ağaç Sayısı: {item.treeAmount}</p>}
+                            {item.priceRange && <p>Fiyat Aralığı: {item.priceRange}</p>}
                             {item.details && <p>Açıklama: {item.details}</p>}
+                            {item.seller && <p>Satıcı: {item.seller}</p>}
                         </Card>
                     </List.Item>
                 )}

@@ -113,8 +113,8 @@ const MainPage = () => {
                 >
                     {user && <Routes>
                         <Route path='/welcome' element={<WelcomePage data={data}></WelcomePage>}></Route>
-                        <Route path='/emlakekle' element={<CreateEstate></CreateEstate>}></Route>
-                        <Route path='/estatelist' element={<Estates></Estates>}></Route>
+                        <Route path='/emlakekle' element={<CreateEstate data={data}></CreateEstate>}></Route>
+                        <Route path='/estatelist' element={<Estates data={data}></Estates>}></Route>
                     </Routes>
                     }
 
