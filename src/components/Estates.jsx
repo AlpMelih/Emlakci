@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Input, Button, Card, List, } from 'antd';
+import { Form, Select, Button, Card, List } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { db } from '../firebase';
 import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
@@ -36,18 +36,13 @@ function Estates(props) {
         fetchEstates();
     }, []);
 
-    //Tüm Değerleri null yapmak için fonksiyon
     const resetFilters = () => {
         const resetState = Object.keys(filters).reduce((states, key) => {
-            states[key] = null
+            states[key] = null;
             return states;
-
-        }, {})
-        setFilters(resetState)
-
-    }
-
-
+        }, {});
+        setFilters(resetState);
+    };
 
     const handleSearch = async () => {
         const estateCollection = collection(db, 'estates');
@@ -83,6 +78,7 @@ function Estates(props) {
         if (filters.fieldAcre) {
             q = query(q, where("fieldAcre", "", filters.fieldAcre))
         }
+
         const querySnapshot = await getDocs(q);
         const estatesData = [];
         querySnapshot.forEach((doc) => {
@@ -93,9 +89,7 @@ function Estates(props) {
 
     const handleDelete = async (id) => {
         try {
-
             await deleteDoc(doc(db, 'estates', id));
-
             setEstates(estates.filter(estate => estate.id !== id));
         } catch (error) {
             console.error("Error deleting estate: ", error);
@@ -110,14 +104,14 @@ function Estates(props) {
                         <Select
                             showSearch
                             placeholder="Emlak Tipi Seç"
-                            onChange={(value) => { resetFilters, setFilters({ estateType: value }) }}
+                            onChange={(value) => { resetFilters; setFilters({ estateType: value }) }}
                         >
                             <Option value="Konut">Konut</Option>
                             <Option value="İş yeri">İş yeri</Option>
                             <Option value="Arsa">Arsa</Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item label="Fiyat Aralığı" required>
+                    <Form.Item label="Fiyat Aralığı">
                         <Select
                             showSearch
                             placeholder="Fiyat Aralığı"
@@ -202,7 +196,6 @@ function Estates(props) {
                                     <Option value="Tarla">Tarla</Option>
                                     <Option value="İmara Uygun">İmara Uygun</Option>
                                 </Select>
-
                             </Form.Item>
 
                             {filters.landType === "Zeytinlik" && (
@@ -222,22 +215,18 @@ function Estates(props) {
                                             <Option value="300-700">300-700</Option>
                                             <Option value="700-1500">700-1500</Option>
                                             <Option value="1500+">1500+</Option>
-
-
                                         </Select>
                                     </Form.Item>
-
                                 </>
                             )}
                             {filters.landType === "Tarla" && (
                                 <>
-                                    <Form.Item label="Dönüm Mikarı" required>.
+                                    <Form.Item label="Dönüm Mikarı">
                                         <Select
                                             showSearch
                                             placeholder="Dönüm Miktarı"
                                             optionFilterProp='children'
                                             onChange={(value) => setFilters({ ...filters, fieldAcre: value })}
-
                                         >
                                             <Option value="1">1</Option>
                                             <Option value="2">2</Option>
@@ -253,10 +242,8 @@ function Estates(props) {
                                     </Form.Item>
                                 </>
                             )}
-
                         </>
-                    )
-                    }
+                    )}
 
                     <Form.Item>
                         <Button type="primary" onClick={handleSearch} style={{ width: "100%" }}>
@@ -271,13 +258,21 @@ function Estates(props) {
                 renderItem={item => (
                     <List.Item>
                         <Card title={item.estateType}>
-
                             {props.data.username === item.seller && (
                                 <DeleteOutlined
                                     onClick={() => handleDelete(item.id)}
                                     style={{ position: 'absolute', top: 10, right: 10, cursor: 'pointer' }}
                                 />
                             )}
+
+                            {item.imageUrl && (
+                                <img
+                                    src={`${item.imageUrl}`}
+
+                                    style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
+                                />
+                            )}
+
                             {item.leks && <p>Kat Sayısı: {item.leks}</p>}
                             {item.room && <p>Oda Sayısı: {item.room}</p>}
                             {item.m2 && <p>Metrekare: {item.m2}</p>}

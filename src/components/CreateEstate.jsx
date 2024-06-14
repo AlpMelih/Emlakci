@@ -3,21 +3,11 @@ import { Form, Select, Input, Button, Card } from 'antd';
 import { db } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const { Option } = Select;
 
 function CreateEstate(props) {
-
-
-    useEffect(() => {
-
-        setSeller(props.data.username)
-
-    }, [])
-
-
-
-
     const navigate = useNavigate();
     const [estateType, setEstateType] = useState("");
     const [leks, setLeks] = useState("");
@@ -25,12 +15,19 @@ function CreateEstate(props) {
     const [details, setDetails] = useState("");
     const [state, setState] = useState("");
     const [m2, setm2] = useState("");
-    const [landType, setLandType] = useState("")
-    const [treeAmount, setTreeAmount] = useState("")
-    const [priceRange, setPriceRange] = useState("")
-    const [seller, setSeller] = useState("")
-    const [fieldAcre, setFieldAcre] = useState("")
+    const [landType, setLandType] = useState("");
+    const [treeAmount, setTreeAmount] = useState("");
+    const [priceRange, setPriceRange] = useState("");
+    const [seller, setSeller] = useState("");
+    const [fieldAcre, setFieldAcre] = useState("");
+    const [file, setFile] = useState(null);
+    const [imageUrl, setImageUrl] = useState("");
 
+    useEffect(() => {
+        setSeller(props.data.username);
+    }, [props.data.username]);
+
+    const storage = getStorage();
 
     const onChangeEstate = (value) => {
         setEstateType(value);
@@ -41,55 +38,79 @@ function CreateEstate(props) {
         setm2("");
         setLandType("");
         setTreeAmount("");
-        setPriceRange("")
-        setFieldAcre("")
+        setPriceRange("");
+        setFieldAcre("");
     };
 
-    const onChangeFieldAcre = (value) => {
-        setFieldAcre(value)
-    }
+    const onChangeFieldAcre = (value) => setFieldAcre(value);
 
-    const onChangePriceRange = (value) => {
-        setPriceRange(value)
-    }
+    const onChangePriceRange = (value) => setPriceRange(value);
 
-    const onChangeTreeAmount = (value) => {
-        setTreeAmount(value);
+    const onChangeTreeAmount = (value) => setTreeAmount(value);
 
-    }
     const onChangeLandType = (value) => {
         setLandType(value);
         setTreeAmount("");
     };
 
-    const onChangeLeks = (value) => {
-        setLeks(value);
+    const onChangeLeks = (value) => setLeks(value);
+
+    const onChangeRoom = (value) => setRoom(value);
+
+    const onChangeState = (value) => setState(value);
+
+    const onChangem2 = (value) => setm2(value);
+
+    const handleFileChange = (e) => {
+        if (e.target.files[0]) {
+            setFile(e.target.files[0]);
+        }
     };
 
-    const onChangeRoom = (value) => {
-        setRoom(value);
+    const uploadImage = async () => {
+        if (!file) return;
+
+        const storageRef = ref(storage, `images/${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        return new Promise((resolve, reject) => {
+            uploadTask.on(
+                "state_changed",
+                (snapshot) => { },
+                (error) => {
+                    console.error("Yükleme hatası: ", error);
+                    alert("Görsel yükleme hatası!");
+                    reject(error);
+                },
+                async () => {
+                    try {
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                        setImageUrl(downloadURL);
+                        resolve(downloadURL);
+                        alert("Görsel başarıyla yüklendi!");
+                    } catch (error) {
+                        console.error("URL alma hatası: ", error);
+                        reject(error);
+                    }
+                }
+            );
+        });
     };
 
-    const onChangeState = (value) => {
-        setState(value);
-    };
-
-    const onChangem2 = (value) => {
-        setm2(value);
-    };
 
     const handleSubmit = async () => {
-        if ((!estateType) || (!priceRange)
+        if ((!estateType) || (!priceRange) || (!details) || (!imageUrl)
             || (estateType === "Konut" && (!leks || !room || !details))
             || (estateType === "İş yeri" && (!details || !m2 || !state))
             || (estateType === "Arsa" && (!landType ||
                 (landType === "Zeytinlik" && (!treeAmount)) ||
                 (landType === "Tarla" && (!fieldAcre)))
             )) {
-
             alert("Lütfen tüm alanları doldurun.");
             return;
         }
+
+
 
         try {
             await addDoc(collection(db, "estates"), {
@@ -103,8 +124,8 @@ function CreateEstate(props) {
                 treeAmount,
                 priceRange,
                 seller,
-                fieldAcre
-
+                fieldAcre,
+                imageUrl
             });
             alert("Emlak başarıyla eklendi!");
             navigate("/home/welcome");
@@ -114,9 +135,7 @@ function CreateEstate(props) {
     };
 
 
-    const customFilterOption = (input, option) => {
-        return (option.children.toLowerCase().startsWith(input.toLowerCase()));
-    };
+    const customFilterOption = (input, option) => option.children.toLowerCase().startsWith(input.toLowerCase());
 
     return (
         <Card title="Emlak Ekle" bordered={false} style={{ maxWidth: 600, margin: "auto", marginTop: 50 }}>
@@ -164,13 +183,6 @@ function CreateEstate(props) {
                                 <Option value="4+1">4+1</Option>
                             </Select>
                         </Form.Item>
-                        <Form.Item label="Açıklama" required>
-                            <Input.TextArea
-                                onChange={(e) => setDetails(e.target.value)}
-                                placeholder="Açıklama Yazınız"
-                                value={details}
-                            />
-                        </Form.Item>
                     </>
                 )}
 
@@ -202,13 +214,6 @@ function CreateEstate(props) {
                                 <Option value="200-250">200-250</Option>
                             </Select>
                         </Form.Item>
-                        <Form.Item label="Açıklama" required>
-                            <Input.TextArea
-                                onChange={(e) => setDetails(e.target.value)}
-                                placeholder="Açıklama Yazınız"
-                                value={details}
-                            />
-                        </Form.Item>
                     </>
                 )}
 
@@ -224,12 +229,11 @@ function CreateEstate(props) {
                             >
                                 <Option value="Zeytinlik">Zeytinlik</Option>
                                 <Option value="Tarla">Tarla</Option>
-
                             </Select>
                         </Form.Item>
                         {landType === "Zeytinlik" && (
                             <>
-                                <Form.Item label="Ağaç Sayısı" required>.
+                                <Form.Item label="Ağaç Sayısı" required>
                                     <Select
                                         showSearch
                                         placeholder="Ağaç Sayısı"
@@ -253,7 +257,7 @@ function CreateEstate(props) {
                         )}
                         {landType === "Tarla" && (
                             <>
-                                <Form.Item label="Dönüm Mikarı" required>.
+                                <Form.Item label="Dönüm Mikarı" required>
                                     <Select
                                         showSearch
                                         placeholder="Dönüm Miktarı"
@@ -277,6 +281,7 @@ function CreateEstate(props) {
                         )}
                     </>
                 )}
+
                 <Form.Item label="Fiyat Aralığı" required>
                     <Select
                         showSearch
@@ -298,17 +303,32 @@ function CreateEstate(props) {
                         <Option value="5000000-10000000">5000000-10000000</Option>
                         <Option value="10000000-100000000">10000000-100000000</Option>
                         <Option value="100000000++">100000000++</Option>
-
-
                     </Select>
+                </Form.Item>
 
+                <Form.Item label="Açıklama" required>
+                    <Input.TextArea
+                        onChange={(e) => setDetails(e.target.value)}
+                        placeholder="Açıklama Yazınız"
+                        value={details}
+                    />
+                </Form.Item>
+
+                <Form.Item label="Görsel Yükle" required>
+                    <Input type="file" accept="image/*" onChange={handleFileChange} />
                 </Form.Item>
 
                 <Form.Item>
-                    <Button type="primary" onClick={handleSubmit} style={{ width: "100%" }}>
+                    <Button type="primary" onClick={async () => {
+                        const url = await uploadImage();
+                        if (url) {
+                            handleSubmit();
+                        }
+                    }} style={{ width: "100%" }}>
                         Emlak Ekle
                     </Button>
                 </Form.Item>
+
             </Form>
         </Card>
     );
