@@ -29,6 +29,8 @@ function CreateEstate(props) {
     const [treeAmount, setTreeAmount] = useState("")
     const [priceRange, setPriceRange] = useState("")
     const [seller, setSeller] = useState("")
+    const [fieldAcre, setFieldAcre] = useState("")
+
 
     const onChangeEstate = (value) => {
         setEstateType(value);
@@ -40,7 +42,12 @@ function CreateEstate(props) {
         setLandType("");
         setTreeAmount("");
         setPriceRange("")
+        setFieldAcre("")
     };
+
+    const onChangeFieldAcre = (value) => {
+        setFieldAcre(value)
+    }
 
     const onChangePriceRange = (value) => {
         setPriceRange(value)
@@ -75,7 +82,9 @@ function CreateEstate(props) {
         if ((!estateType) || (!priceRange)
             || (estateType === "Konut" && (!leks || !room || !details))
             || (estateType === "İş yeri" && (!details || !m2 || !state))
-            || (estateType === "Arsa" && (!landType || (landType === "Zeytinlik" && (!treeAmount)))
+            || (estateType === "Arsa" && (!landType ||
+                (landType === "Zeytinlik" && (!treeAmount)) ||
+                (landType === "Tarla" && (!fieldAcre)))
             )) {
 
             alert("Lütfen tüm alanları doldurun.");
@@ -94,6 +103,7 @@ function CreateEstate(props) {
                 treeAmount,
                 priceRange,
                 seller,
+                fieldAcre
 
             });
             alert("Emlak başarıyla eklendi!");
@@ -214,12 +224,12 @@ function CreateEstate(props) {
                             >
                                 <Option value="Zeytinlik">Zeytinlik</Option>
                                 <Option value="Tarla">Tarla</Option>
-                                <Option value="İmara Uygun">İmara Uygun</Option>
+
                             </Select>
                         </Form.Item>
                         {landType === "Zeytinlik" && (
                             <>
-                                <Form.Item label="Ağaç Sayısı" required>
+                                <Form.Item label="Ağaç Sayısı" required>.
                                     <Select
                                         showSearch
                                         placeholder="Ağaç Sayısı"
@@ -234,6 +244,33 @@ function CreateEstate(props) {
                                         <Option value="75-100">75-100</Option>
                                         <Option value="100-150">100-150</Option>
                                         <Option value="150-300">150-300</Option>
+                                        <Option value="300-700">300-700</Option>
+                                        <Option value="700-1500">700-1500</Option>
+                                        <Option value="1500+">1500+</Option>
+                                    </Select>
+                                </Form.Item>
+                            </>
+                        )}
+                        {landType === "Tarla" && (
+                            <>
+                                <Form.Item label="Dönüm Mikarı" required>.
+                                    <Select
+                                        showSearch
+                                        placeholder="Dönüm Miktarı"
+                                        optionFilterProp='children'
+                                        onChange={onChangeFieldAcre}
+                                        filterOption={customFilterOption}
+                                    >
+                                        <Option value="1">1</Option>
+                                        <Option value="2">2</Option>
+                                        <Option value="3">3</Option>
+                                        <Option value="4">4</Option>
+                                        <Option value="5">5</Option>
+                                        <Option value="6">6</Option>
+                                        <Option value="7">7</Option>
+                                        <Option value="8">8</Option>
+                                        <Option value="9">9</Option>
+                                        <Option value="10+">10+</Option>
                                     </Select>
                                 </Form.Item>
                             </>

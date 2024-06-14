@@ -18,6 +18,7 @@ function Estates(props) {
         treeAmount: null,
         priceRange: null,
         seller: null,
+        fieldAcre: null
     });
     const [estates, setEstates] = useState([]);
 
@@ -34,6 +35,19 @@ function Estates(props) {
 
         fetchEstates();
     }, []);
+
+    //Tüm Değerleri null yapmak için fonksiyon
+    const resetFilters = () => {
+        const resetState = Object.keys(filters).reduce((states, key) => {
+            states[key] = null
+            return states;
+
+        }, {})
+        setFilters(resetState)
+
+    }
+
+
 
     const handleSearch = async () => {
         const estateCollection = collection(db, 'estates');
@@ -66,7 +80,9 @@ function Estates(props) {
         if (filters.priceRange) {
             q = query(q, where('priceRange', '==', filters.priceRange));
         }
-
+        if (filters.fieldAcre) {
+            q = query(q, where("fieldAcre", "", filters.fieldAcre))
+        }
         const querySnapshot = await getDocs(q);
         const estatesData = [];
         querySnapshot.forEach((doc) => {
@@ -94,7 +110,7 @@ function Estates(props) {
                         <Select
                             showSearch
                             placeholder="Emlak Tipi Seç"
-                            onChange={(value) => { setFilters({ estateType: value, leks: null, room: null, details: null, m2: null, state: null }) }}
+                            onChange={(value) => { resetFilters, setFilters({ estateType: value }) }}
                         >
                             <Option value="Konut">Konut</Option>
                             <Option value="İş yeri">İş yeri</Option>
@@ -105,7 +121,9 @@ function Estates(props) {
                         <Select
                             showSearch
                             placeholder="Fiyat Aralığı"
-                            onChange={(value) => setFilters({ ...filters, priceRange: value })}>
+                            onChange={(value) => setFilters({ ...filters, priceRange: value })}
+                            value={filters.priceRange}>
+
                             <Option value="0-1000">0-1000</Option>
                             <Option value="1000-5000">1000-5000</Option>
                             <Option value="5000-15000">5000-15000</Option>
@@ -171,7 +189,74 @@ function Estates(props) {
                                     <Option value="Kiralık">Kiralık</Option>
                                 </Select>
                             </Form.Item>
-                        </div>}
+                        </div>
+                    }
+
+                    {filters.estateType === "Arsa" && (
+                        <>
+                            <Form.Item label="Arsa Tipi">
+                                <Select showSearch
+                                    placeholder="Arsa Tipi"
+                                    onChange={(value) => setFilters({ ...filters, landType: value })}>
+                                    <Option value="Zeytinlik">Zeytinlik</Option>
+                                    <Option value="Tarla">Tarla</Option>
+                                    <Option value="İmara Uygun">İmara Uygun</Option>
+                                </Select>
+
+                            </Form.Item>
+
+                            {filters.landType === "Zeytinlik" && (
+                                <>
+                                    <Form.Item label="Ağaç Sayısı">
+                                        <Select showSearch
+                                            placeholder="Ağaç Sayısı"
+                                            onChange={(value) => setFilters({ ...filters, treeAmount: value })}>
+
+                                            <Option value="15-30">15-30</Option>
+                                            <Option value="30-45">30-45</Option>
+                                            <Option value="45-60">45-60</Option>
+                                            <Option value="60-75">60-75</Option>
+                                            <Option value="75-100">75-100</Option>
+                                            <Option value="100-150">100-150</Option>
+                                            <Option value="150-300">150-300</Option>
+                                            <Option value="300-700">300-700</Option>
+                                            <Option value="700-1500">700-1500</Option>
+                                            <Option value="1500+">1500+</Option>
+
+
+                                        </Select>
+                                    </Form.Item>
+
+                                </>
+                            )}
+                            {filters.landType === "Tarla" && (
+                                <>
+                                    <Form.Item label="Dönüm Mikarı" required>.
+                                        <Select
+                                            showSearch
+                                            placeholder="Dönüm Miktarı"
+                                            optionFilterProp='children'
+                                            onChange={(value) => setFilters({ ...filters, fieldAcre: value })}
+
+                                        >
+                                            <Option value="1">1</Option>
+                                            <Option value="2">2</Option>
+                                            <Option value="3">3</Option>
+                                            <Option value="4">4</Option>
+                                            <Option value="5">5</Option>
+                                            <Option value="6">6</Option>
+                                            <Option value="7">7</Option>
+                                            <Option value="8">8</Option>
+                                            <Option value="9">9</Option>
+                                            <Option value="10+">10+</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </>
+                            )}
+
+                        </>
+                    )
+                    }
 
                     <Form.Item>
                         <Button type="primary" onClick={handleSearch} style={{ width: "100%" }}>
