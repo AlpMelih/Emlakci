@@ -321,14 +321,20 @@ function CreateEstate(props) {
                 <Form.Item>
                     <Button type="primary" onClick={async () => {
                         const url = await uploadImage();
-                        if (url) {
-                            handleSubmit();
-                        }
+
+                    }} style={{ width: "100%" }}>
+                        Resmi Yükle
+                    </Button>
+                </Form.Item>
+
+                <Form.Item>
+                    <Button type="primary" onClick={() => {
+                        handleSubmit()
+
                     }} style={{ width: "100%" }}>
                         Emlak Ekle
                     </Button>
                 </Form.Item>
-
             </Form>
         </Card>
     );
