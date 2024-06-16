@@ -99,7 +99,7 @@ function CreateEstate(props) {
 
 
     const handleSubmit = async () => {
-        if ((!estateType) || (!priceRange) || (!details) || (!imageUrl)
+        if ((!estateType) || (!priceRange) || (!details) || (!imageUrl) || (!state)
             || (estateType === "Konut" && (!leks || !room || !details))
             || (estateType === "İş yeri" && (!details || !m2 || !state))
             || (estateType === "Arsa" && (!landType ||
@@ -153,7 +153,18 @@ function CreateEstate(props) {
                         <Option value="Arsa">Arsa</Option>
                     </Select>
                 </Form.Item>
-
+                <Form.Item label="Durumu" required>
+                    <Select
+                        showSearch
+                        placeholder="Durumu"
+                        optionFilterProp="children"
+                        onChange={onChangeState}
+                        filterOption={customFilterOption}
+                    >
+                        <Option value="Satılık">Satılık</Option>
+                        <Option value="Kiralık">Kiralık</Option>
+                    </Select>
+                </Form.Item>
                 {estateType === "Konut" && (
                     <>
                         <Form.Item label="Kat Sayısı" required>
@@ -188,18 +199,7 @@ function CreateEstate(props) {
 
                 {estateType === "İş yeri" && (
                     <>
-                        <Form.Item label="Durumu" required>
-                            <Select
-                                showSearch
-                                placeholder="Durumu"
-                                optionFilterProp="children"
-                                onChange={onChangeState}
-                                filterOption={customFilterOption}
-                            >
-                                <Option value="Satılık">Satılık</Option>
-                                <Option value="Kiralık">Kiralık</Option>
-                            </Select>
-                        </Form.Item>
+
                         <Form.Item label="Metrekare" required>
                             <Select
                                 showSearch
