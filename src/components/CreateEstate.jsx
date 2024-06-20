@@ -42,7 +42,11 @@ function CreateEstate(props) {
         setFieldAcre("");
     };
 
-    const onChangeFieldAcre = (value) => setFieldAcre(value);
+    const onChangeFieldAcre = (value) => {
+        setFieldAcre(value)
+
+
+    }
 
     const onChangePriceRange = (value) => setPriceRange(value);
 
@@ -51,6 +55,7 @@ function CreateEstate(props) {
     const onChangeLandType = (value) => {
         setLandType(value);
         setTreeAmount("");
+        setFieldAcre("")
     };
 
     const onChangeLeks = (value) => setLeks(value);

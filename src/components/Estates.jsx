@@ -109,6 +109,7 @@ function Estates(props) {
                             <Option value="Konut">Konut</Option>
                             <Option value="İş yeri">İş yeri</Option>
                             <Option value="Arsa">Arsa</Option>
+                            <Option value={null}>Boş Bırak</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item label="Fiyat Aralığı">
@@ -130,6 +131,7 @@ function Estates(props) {
                             <Option value="5000000-10000000">5000000-10000000</Option>
                             <Option value="10000000-100000000">10000000-100000000</Option>
                             <Option value="100000000++">100000000++</Option>
+                            <Option value={null}>Boş Bırak</Option>
                         </Select>
                     </Form.Item>
                     {filters.estateType === "Konut" &&
@@ -143,6 +145,7 @@ function Estates(props) {
                                     <Option value="Tek kat">Tek kat</Option>
                                     <Option value="Dubleks">Dubleks</Option>
                                     <Option value="Tripleks">Tripleks</Option>
+                                    <Option value={null}>Boş Bırak</Option>
                                 </Select>
                             </Form.Item>
                             <Form.Item label="Oda Sayısı">
@@ -155,6 +158,7 @@ function Estates(props) {
                                     <Option value="2+1">2+1</Option>
                                     <Option value="3+1">3+1</Option>
                                     <Option value="4+1">4+1</Option>
+                                    <Option value={null}>Boş Bırak</Option>
                                 </Select>
                             </Form.Item>
                         </div>}
@@ -171,6 +175,7 @@ function Estates(props) {
                                     <Option value="100-150">100-150</Option>
                                     <Option value="150-200">150-200</Option>
                                     <Option value="200-250">200-250</Option>
+                                    <Option value={null}>Boş Bırak</Option>
                                 </Select>
                             </Form.Item>
                             <Form.Item label="Durumu">
@@ -181,6 +186,7 @@ function Estates(props) {
                                 >
                                     <Option value="Satılık">Satılık</Option>
                                     <Option value="Kiralık">Kiralık</Option>
+                                    <Option value={null}>Boş Bırak</Option>
                                 </Select>
                             </Form.Item>
                         </div>
@@ -195,6 +201,7 @@ function Estates(props) {
                                     <Option value="Zeytinlik">Zeytinlik</Option>
                                     <Option value="Tarla">Tarla</Option>
                                     <Option value="İmara Uygun">İmara Uygun</Option>
+                                    <Option value={null}>Boş Bırak</Option>
                                 </Select>
                             </Form.Item>
 
@@ -215,6 +222,7 @@ function Estates(props) {
                                             <Option value="300-700">300-700</Option>
                                             <Option value="700-1500">700-1500</Option>
                                             <Option value="1500+">1500+</Option>
+                                            <Option value={null}>Boş Bırak</Option>
                                         </Select>
                                     </Form.Item>
                                 </>
@@ -238,6 +246,7 @@ function Estates(props) {
                                             <Option value="8">8</Option>
                                             <Option value="9">9</Option>
                                             <Option value="10+">10+</Option>
+                                            <Option value={null}>Boş Bırak</Option>
                                         </Select>
                                     </Form.Item>
                                 </>
