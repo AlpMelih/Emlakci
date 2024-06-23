@@ -1,66 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Menu, Breadcrumb, theme } from 'antd';
+import { Layout, Menu, Breadcrumb, theme, Button } from 'antd'; // Import Button from 'antd'
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import LoginRegister from './LoginRegister';
-import { collection, doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import WelcomePage from './WelcomePage';
 import CreateEstate from './CreateEstate';
 import Estates from './Estates';
-import { Button } from 'antd/es/radio';
 import { signOut } from 'firebase/auth';
-
 
 const { Header, Content, Footer } = Layout;
 
-const items = new Array(0).fill(null).map((_, index) => ({
-    key: String(index + 1),
-    label: `nav ${index + 1}`,
-}));
+// Define meaningful menu items with keys and labels
+const menuItems = [
+
+];
 
 const MainPage = () => {
-    const [user, setUser] = useState(false)
-    const [data, setData] = useState()
+    const [user, setUser] = useState(false);
+    const [data, setData] = useState();
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
-    const history = useNavigate()
+    const navigate = useNavigate();
 
     const handleSignOut = async () => {
         try {
             await signOut(auth);
+            navigate('/loginregister');
         } catch (error) {
             console.error('Error signing out:', error);
         }
     };
 
     useEffect(() => {
-
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (!user) {
-
-                history('/loginregister');
-            }
-            else {
-
-                const userUID = user.uid
-                console.log(userUID)
-                const DocRef = doc(db, "users", userUID)
-                const getData = await getDoc(DocRef)
-                const data = getData.data()
-                setData(data)
-                setUser(true)
-
+                navigate('/loginregister');
+            } else {
+                const userUID = user.uid;
+                console.log(userUID);
+                const DocRef = doc(db, "users", userUID);
+                const getData = await getDoc(DocRef);
+                const data = getData.data();
+                setData(data);
+                setUser(true);
             }
         });
-
-
 
         return () => {
             unsubscribe();
         };
-    }, [history]);
+    }, [navigate]);
+
+    // Handle menu item click
+    const handleMenuClick = (e) => {
+        const selectedItem = menuItems.find(item => item.key === e.key);
+        if (selectedItem) {
+            navigate(selectedItem.path);
+        }
+    };
 
     return (
         <Layout style={{ minHeight: '100vh', minWidth: '100vw' }}>
@@ -78,16 +78,19 @@ const MainPage = () => {
                 <Menu
                     theme="dark"
                     mode="horizontal"
-                    defaultSelectedKeys={['2']}
-                    items={items}
+                    defaultSelectedKeys={['1']}
+                    items={menuItems.map(item => ({ key: item.key, label: item.label }))}
+                    onClick={handleMenuClick}
                     style={{
                         flex: 1,
                         minWidth: 0,
                     }}
-
                 />
                 {user && (
-                    <Button type="primary" onClick={handleSignOut}>Sign Out</Button>
+                    <>
+                        <Button type="primary" onClick={() => navigate(-1)}>Back</Button> {/* Back button */}
+                        <Button type="primary" onClick={handleSignOut} style={{ marginLeft: 8 }}>Sign Out</Button>
+                    </>
                 )}
             </Header>
             <Content
@@ -101,7 +104,7 @@ const MainPage = () => {
                         margin: '16px 0',
                     }}
                 >
-
+                    {/* Breadcrumbs can be dynamically added here */}
                 </Breadcrumb>
                 <div
                     style={{
@@ -111,13 +114,13 @@ const MainPage = () => {
                         borderRadius: borderRadiusLG,
                     }}
                 >
-                    {user && <Routes>
-                        <Route path='/welcome' element={<WelcomePage data={data}></WelcomePage>}></Route>
-                        <Route path='/emlakekle' element={<CreateEstate data={data}></CreateEstate>}></Route>
-                        <Route path='/estatelist' element={<Estates data={data}></Estates>}></Route>
-                    </Routes>
-                    }
-
+                    {user && (
+                        <Routes>
+                            <Route path='/welcome' element={<WelcomePage data={data} />} />
+                            <Route path='/emlakekle' element={<CreateEstate data={data} />} />
+                            <Route path='/estatelist' element={<Estates data={data} />} />
+                        </Routes>
+                    )}
                 </div>
             </Content>
             <Footer
@@ -126,7 +129,7 @@ const MainPage = () => {
                     flexShrink: 0,
                 }}
             >
-
+                Real Estate Management System ©2024
             </Footer>
         </Layout>
     );
