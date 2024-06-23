@@ -291,6 +291,7 @@ function Estates(props) {
                             {item.priceRange && <p>Fiyat Aralığı: {item.priceRange}</p>}
                             {item.details && <p>Açıklama: {item.details}</p>}
                             {item.seller && <p>Satıcı: {item.seller}</p>}
+                            {item.fieldAcre && <p>Dönüm Mikarı: {item.fieldAcre}</p>}
                         </Card>
                     </List.Item>
                 )}
