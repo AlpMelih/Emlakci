@@ -129,7 +129,7 @@ const MainPage = () => {
                     flexShrink: 0,
                 }}
             >
-                Real Estate Management System ©2024
+
             </Footer>
         </Layout>
     );

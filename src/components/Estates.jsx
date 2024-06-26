@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Button, Card, List } from 'antd';
+import { Form, Select, Button, Card, List, Checkbox } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { db } from '../firebase';
 import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
@@ -21,6 +21,7 @@ function Estates(props) {
         fieldAcre: null
     });
     const [estates, setEstates] = useState([]);
+    const [sellerFilter, setSellerFilter] = useState(null);
 
     useEffect(() => {
         const fetchEstates = async () => {
@@ -36,13 +37,6 @@ function Estates(props) {
         fetchEstates();
     }, []);
 
-    const resetFilters = () => {
-        const resetState = Object.keys(filters).reduce((states, key) => {
-            states[key] = null;
-            return states;
-        }, {});
-        setFilters(resetState);
-    };
 
     const handleSearch = async () => {
         const estateCollection = collection(db, 'estates');
@@ -76,7 +70,14 @@ function Estates(props) {
             q = query(q, where('priceRange', '==', filters.priceRange));
         }
         if (filters.fieldAcre) {
-            q = query(q, where("fieldAcre", "", filters.fieldAcre))
+            q = query(q, where('fieldAcre', '==', filters.fieldAcre));
+        }
+
+
+        if (sellerFilter === 'otherSellers') {
+            q = query(q, where('seller', '!=', props.data.username));
+        } else if (sellerFilter === 'myEstates') {
+            q = query(q, where('seller', '==', props.data.username));
         }
 
         const querySnapshot = await getDocs(q);
@@ -96,6 +97,10 @@ function Estates(props) {
         }
     };
 
+    const handleSellerFilterChange = (filter) => {
+        setSellerFilter(filter);
+    };
+
     return (
         <div style={{ padding: '20px' }}>
             <Card title="Emlak Arama" bordered={false} style={{ maxWidth: 800, margin: 'auto', marginBottom: 50 }}>
@@ -104,7 +109,7 @@ function Estates(props) {
                         <Select
                             showSearch
                             placeholder="Emlak Tipi Seç"
-                            onChange={(value) => { resetFilters; setFilters({ estateType: value }) }}
+                            onChange={(value) => setFilters({ ...filters, estateType: value })}
                         >
                             <Option value="Konut">Konut</Option>
                             <Option value="İş yeri">İş yeri</Option>
@@ -134,6 +139,7 @@ function Estates(props) {
                             <Option value={null}>Boş Bırak</Option>
                         </Select>
                     </Form.Item>
+
                     {filters.estateType === "Konut" &&
                         <div>
                             <Form.Item label="Kat Sayısı">
@@ -254,6 +260,22 @@ function Estates(props) {
                         </>
                     )}
 
+                    <Form.Item label="Satıcı Filtresi">
+                        <Checkbox.Group
+                            value={[sellerFilter]}
+                            onChange={(values) => {
+                                if (values.length > 1) {
+                                    values = values.slice(-1);
+                                }
+                                setSellerFilter(values[0] || null);
+                            }}
+                        >
+                            <Checkbox value="allSellers">Ben dahil diğer satıcıları göster</Checkbox>
+                            <Checkbox value="otherSellers">Diğer satıcılar</Checkbox>
+                            <Checkbox value="myEstates">Benim emlaklarım</Checkbox>
+                        </Checkbox.Group>
+                    </Form.Item>
+
                     <Form.Item>
                         <Button type="primary" onClick={handleSearch} style={{ width: "100%" }}>
                             Ara
@@ -277,7 +299,6 @@ function Estates(props) {
                             {item.imageUrl && (
                                 <img
                                     src={`${item.imageUrl}`}
-
                                     style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
                                 />
                             )}
