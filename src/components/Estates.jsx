@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Button, Card, List, Checkbox } from 'antd';
+import { Form, Select, Button, Card, List, Checkbox, Modal } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { db } from '../firebase';
 import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
+import './Styles.css';
 
 const { Option } = Select;
 
@@ -22,6 +23,7 @@ function Estates(props) {
     });
     const [estates, setEstates] = useState([]);
     const [sellerFilter, setSellerFilter] = useState(null);
+    const [selectedEstate, setSelectedEstate] = useState(null); // For Modal
 
     useEffect(() => {
         const fetchEstates = async () => {
@@ -36,7 +38,6 @@ function Estates(props) {
 
         fetchEstates();
     }, []);
-
 
     const handleSearch = async () => {
         const estateCollection = collection(db, 'estates');
@@ -73,7 +74,6 @@ function Estates(props) {
             q = query(q, where('fieldAcre', '==', filters.fieldAcre));
         }
 
-
         if (sellerFilter === 'otherSellers') {
             q = query(q, where('seller', '!=', props.data.username));
         } else if (sellerFilter === 'myEstates') {
@@ -99,6 +99,14 @@ function Estates(props) {
 
     const handleSellerFilterChange = (filter) => {
         setSellerFilter(filter);
+    };
+
+    const showEstateDetails = (estate) => {
+        setSelectedEstate(estate);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedEstate(null);
     };
 
     return (
@@ -128,7 +136,7 @@ function Estates(props) {
                             <Option value="1000-5000">1000-5000</Option>
                             <Option value="5000-15000">5000-15000</Option>
                             <Option value="15000-40000">15000-40000</Option>
-                            <Option value="40000-850000">40000-85000</Option>
+                            <Option value="40000-850000">40000-850000</Option>
                             <Option value="85000-150000">85000-150000</Option>
                             <Option value="150000-500000">150000-500000</Option>
                             <Option value="500000-1000000">500000-1000000</Option>
@@ -288,7 +296,10 @@ function Estates(props) {
                 dataSource={estates}
                 renderItem={item => (
                     <List.Item>
-                        <Card title={item.estateType}>
+                        <Card
+                            title={item.estateType}
+                            style={{ position: 'relative', minHeight: '400px' }}
+                        >
                             {props.data.username === item.seller && (
                                 <DeleteOutlined
                                     onClick={() => handleDelete(item.id)}
@@ -299,7 +310,7 @@ function Estates(props) {
                             {item.imageUrl && (
                                 <img
                                     src={`${item.imageUrl}`}
-                                    style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
+                                    style={{ width: '100%', height: '200px', objectFit: 'cover', marginBottom: '10px' }}
                                 />
                             )}
 
@@ -310,13 +321,49 @@ function Estates(props) {
                             {item.landType && <p>Arsa Türü: {item.landType}</p>}
                             {item.treeAmount && <p>Ağaç Sayısı: {item.treeAmount}</p>}
                             {item.priceRange && <p>Fiyat Aralığı: {item.priceRange}</p>}
-                            {item.details && <p>Açıklama: {item.details}</p>}
+
                             {item.seller && <p>Satıcı: {item.seller}</p>}
                             {item.fieldAcre && <p>Dönüm Mikarı: {item.fieldAcre}</p>}
+
+                            <Button
+                                style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)' }}
+                                onClick={() => showEstateDetails(item)}
+                            >
+                                Detaylar
+                            </Button>
                         </Card>
                     </List.Item>
                 )}
             />
+            <Modal
+                title="Emlak Detayları"
+                visible={!!selectedEstate}
+                onCancel={handleCloseModal}
+                footer={null}
+            >
+                {selectedEstate && (
+                    <div>
+                        <p>Emlak Tipi: {selectedEstate.estateType}</p>
+                        {selectedEstate.leks && <p>Kat Sayısı: {selectedEstate.leks}</p>}
+                        {selectedEstate.room && <p>Oda Sayısı: {selectedEstate.room}</p>}
+                        {selectedEstate.m2 && <p>Metrekare: {selectedEstate.m2}</p>}
+                        {selectedEstate.state && <p>Durumu: {selectedEstate.state}</p>}
+                        {selectedEstate.landType && <p>Arsa Türü: {selectedEstate.landType}</p>}
+                        {selectedEstate.treeAmount && <p>Ağaç Sayısı: {selectedEstate.treeAmount}</p>}
+                        {selectedEstate.priceRange && <p>Fiyat Aralığı: {selectedEstate.priceRange}</p>}
+                        {selectedEstate.details && <p>Açıklama: {selectedEstate.details}</p>}
+                        {selectedEstate.seller && <p>Satıcı: {selectedEstate.seller}</p>}
+                        {selectedEstate.fieldAcre && <p>Dönüm Mikarı: {selectedEstate.fieldAcre}</p>}
+                        {selectedEstate.imageUrl && (
+                            <img
+                                src={`${selectedEstate.imageUrl}`}
+                                style={{ width: '100%', height: 'auto', marginTop: '10px' }}
+                                alt="Estate"
+                            />
+                        )}
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 }

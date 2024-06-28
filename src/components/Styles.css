@@ -1,0 +1,46 @@
+body {
+    background-color: #f5f7fa;
+    font-family: 'Roboto', sans-serif;
+}
+
+
+.ant-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.ant-card:hover {
+    transform: translateY(-5px);
+
+}
+
+
+.ant-btn {
+    border-radius: 8px;
+}
+
+.ant-modal {
+    border-radius: 8px;
+}
+
+.ant-form-item-label>label {
+    font-weight: 500;
+
+}
+
+.ant-select,
+.ant-checkbox-group {
+    border-radius: 8px;
+
+}
+
+
+.ant-list-item {
+    display: flex;
+    justify-content: center;
+}
+
+.ant-list-item .ant-card img {
+    border-radius: 8px;
+}

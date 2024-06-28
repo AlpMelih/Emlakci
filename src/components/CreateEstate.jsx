@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Select, Input, Button, Card } from 'antd';
+import { Form, Select, Input, Button, Card, Modal } from 'antd'; // Modal'ı import ettik
 import { db } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,7 @@ function CreateEstate(props) {
     const [fieldAcre, setFieldAcre] = useState("");
     const [file, setFile] = useState(null);
     const [imageUrl, setImageUrl] = useState("");
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     useEffect(() => {
         setSeller(props.data.username);
@@ -44,8 +45,6 @@ function CreateEstate(props) {
 
     const onChangeFieldAcre = (value) => {
         setFieldAcre(value)
-
-
     }
 
     const onChangePriceRange = (value) => setPriceRange(value);
@@ -102,7 +101,6 @@ function CreateEstate(props) {
         });
     };
 
-
     const handleSubmit = async () => {
         if ((!estateType) || (!priceRange) || (!details) || (!imageUrl) || (!state)
             || (estateType === "Konut" && (!leks || !room || !details))
@@ -114,8 +112,6 @@ function CreateEstate(props) {
             alert("Lütfen tüm alanları doldurun.");
             return;
         }
-
-
 
         try {
             await addDoc(collection(db, "estates"), {
@@ -133,14 +129,18 @@ function CreateEstate(props) {
                 imageUrl
             });
             alert("Emlak başarıyla eklendi!");
-            navigate("/home/welcome");
+            setIsModalVisible(true);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
     };
 
-
     const customFilterOption = (input, option) => option.children.toLowerCase().startsWith(input.toLowerCase());
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+        navigate("/home/welcome");
+    };
 
     return (
         <Card title="Emlak Ekle" bordered={false} style={{ maxWidth: 600, margin: "auto", marginTop: 50 }}>
@@ -326,7 +326,6 @@ function CreateEstate(props) {
                 <Form.Item>
                     <Button type="primary" onClick={async () => {
                         const url = await uploadImage();
-
                     }} style={{ width: "100%" }}>
                         Resmi Yükle
                     </Button>
@@ -335,12 +334,22 @@ function CreateEstate(props) {
                 <Form.Item>
                     <Button type="primary" onClick={() => {
                         handleSubmit()
-
                     }} style={{ width: "100%" }}>
                         Emlak Ekle
                     </Button>
                 </Form.Item>
             </Form>
+
+            <Modal
+                title="Başarılı!"
+                visible={isModalVisible}
+                onOk={handleOk}
+                onCancel={() => setIsModalVisible(false)}
+                okText="Tamam"
+                cancelText="Kapat"
+            >
+                <p>Emlak başarıyla eklendi ve e-posta gönderildi!</p>
+            </Modal>
         </Card>
     );
 }

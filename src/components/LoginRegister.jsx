@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tabs, Form, Input, Button, Checkbox, Layout, Card, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
-import { auth, db } from '../firebase'; // Firebase Auth ve Firestore örneği
+import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
@@ -40,7 +40,7 @@ const LoginRegister = () => {
             const userCredential = await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
             const user = userCredential.user;
 
-            // Firestore'da kullanıcı dokümanı oluşturma
+
             await setDoc(doc(db, 'users', user.uid), {
                 username: registerUsername,
                 email: registerEmail

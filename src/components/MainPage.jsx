@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Menu, Breadcrumb, theme, Button } from 'antd'; // Import Button from 'antd'
+import { Layout, Menu, Breadcrumb, theme, Button } from 'antd';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import LoginRegister from './LoginRegister';
@@ -11,7 +11,6 @@ import { signOut } from 'firebase/auth';
 
 const { Header, Content, Footer } = Layout;
 
-// Define meaningful menu items with keys and labels
 const menuItems = [
 
 ];
@@ -54,7 +53,7 @@ const MainPage = () => {
         };
     }, [navigate]);
 
-    // Handle menu item click
+
     const handleMenuClick = (e) => {
         const selectedItem = menuItems.find(item => item.key === e.key);
         if (selectedItem) {
@@ -88,7 +87,7 @@ const MainPage = () => {
                 />
                 {user && (
                     <>
-                        <Button type="primary" onClick={() => navigate(-1)}>Back</Button> {/* Back button */}
+                        <Button type="primary" onClick={() => navigate(-1)}>Geri</Button>
                         <Button type="primary" onClick={handleSignOut} style={{ marginLeft: 8 }}>Sign Out</Button>
                     </>
                 )}
@@ -104,7 +103,7 @@ const MainPage = () => {
                         margin: '16px 0',
                     }}
                 >
-                    {/* Breadcrumbs can be dynamically added here */}
+
                 </Breadcrumb>
                 <div
                     style={{
